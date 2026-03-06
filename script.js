@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rowsHTML = week.days.map((day, index) => {
             const isLast = index === week.days.length - 1;
             return `
-                <tr class="border-brand-lightgray hover:bg-brand-offwhite ${!isLast ? 'border-b' : ''}">
+                <tr class="border-brand-lightgray hover:bg-brand-offwhite align-top ${!isLast ? 'border-b' : ''}">
                     <td class="p-3 font-semibold text-brand-darkest">Day ${day.day}</td>
                     <td class="p-3">
                         <select class="reflection-input bg-white">
@@ -196,10 +196,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         </select>
                     </td>
                     <td class="p-3">
-                        <textarea class="reflection-input resize-y" rows="1" placeholder="Add your notes here..."></textarea>
+                        <textarea class="reflection-input resize-y min-h-[60px]" rows="3" placeholder="Add your notes here..."></textarea>
                     </td>
                     <td class="p-3">
-                        <textarea class="reflection-input resize-y" rows="1" placeholder="Suggestions for new guides/videos..."></textarea>
+                        <textarea class="reflection-input resize-y min-h-[60px]" rows="3" placeholder="Suggestions for new guides/videos..."></textarea>
                     </td>
                     <td class="p-3 text-center" data-html2canvas-ignore="true">
                         <button class="submit-btn bg-brand-teal hover:bg-brand-dark text-white text-xs font-semibold py-1.5 px-3 rounded shadow-sm transition-colors" data-day="${day.day}" data-week="${week.weekNumber}">
@@ -361,28 +361,110 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.submit-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const button = e.target;
-                const dayNumber = button.getAttribute('data-day');
-                const weekNumber = button.getAttribute('data-week');
+                const dayNumber = parseInt(button.getAttribute('data-day'), 10);
+                const weekNumber = parseInt(button.getAttribute('data-week'), 10);
                 const tableContainer = document.getElementById(`reflection-table-w${weekNumber}`);
 
                 if (!tableContainer) return;
+
+                // Find the specific day's data from scheduleData
+                const weekData = scheduleData.find(w => w.weekNumber === weekNumber);
+                const dayData = weekData ? weekData.days.find(d => d.day === dayNumber) : null;
+                const objective = dayData ? dayData.goal : 'No objective found.';
+
+                // Extract reflection data from the table row
+                const tr = button.closest('tr');
+                const selectElement = tr.querySelector('select');
+                const textareas = tr.querySelectorAll('textarea');
+
+                const escapeHTML = (str) => {
+                    return str.replace(/[&<>'"]/g,
+                        tag => ({
+                            '&': '&amp;',
+                            '<': '&lt;',
+                            '>': '&gt;',
+                            "'": '&#39;',
+                            '"': '&quot;'
+                        }[tag])
+                    );
+                };
+
+                const reflectionResponse = selectElement && selectElement.options[selectElement.selectedIndex].text !== 'Select response...' ? escapeHTML(selectElement.options[selectElement.selectedIndex].text) : 'No response selected';
+                const takeaways = textareas[0] && textareas[0].value ? escapeHTML(textareas[0].value) : 'None';
+                const suggestions = textareas[1] && textareas[1].value ? escapeHTML(textareas[1].value) : 'None';
+                const safeCandidateName = escapeHTML(candidateName || 'Not specified');
+                const safeObjective = escapeHTML(objective);
 
                 try {
                     button.disabled = true;
                     button.textContent = 'Wait...';
                     button.classList.add('opacity-50', 'cursor-not-allowed');
 
-                    // Need a slight delay for UI to update
-                    await new Promise(r => setTimeout(r, 50));
+                    // Create a hidden container for the PDF layout
+                    const pdfContainer = document.createElement('div');
+                    pdfContainer.style.position = 'absolute';
+                    pdfContainer.style.left = '-9999px';
+                    pdfContainer.style.top = '0';
+                    pdfContainer.style.width = '800px';
+                    pdfContainer.style.backgroundColor = '#ffffff';
+                    pdfContainer.style.padding = '40px';
+                    pdfContainer.style.fontFamily = 'sans-serif';
+                    pdfContainer.style.color = '#0f131d'; // brand-darkest
 
-                    const canvas = await html2canvas(tableContainer, {
+                    const today = new Date().toLocaleDateString();
+
+                    pdfContainer.innerHTML = `
+                        <div style="border-bottom: 4px solid #025267; padding-bottom: 20px; margin-bottom: 30px;">
+                            <h1 style="color: #025267; margin: 0; font-size: 28px;">CAD to QA Training Plan</h1>
+                            <div style="display: flex; justify-content: space-between; margin-top: 10px; color: #1a2e3e; font-size: 14px; font-weight: bold;">
+                                <span>Day ${dayNumber} Learning Reflection</span>
+                                <span>Date: ${today}</span>
+                            </div>
+                            <div style="margin-top: 5px; color: #1a2e3e; font-size: 14px;">
+                                <strong>Candidate:</strong> ${safeCandidateName}
+                            </div>
+                        </div>
+
+                        <div style="background-color: #f2f1ef; padding: 20px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #025267;">
+                            <h2 style="margin: 0 0 10px 0; font-size: 18px; color: #0f131d;">Daily Objective</h2>
+                            <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #1a2e3e;">${safeObjective}</p>
+                        </div>
+
+                        <div style="margin-bottom: 30px;">
+                            <h2 style="margin: 0 0 15px 0; font-size: 18px; color: #0f131d; border-bottom: 1px solid #b8b8b8; padding-bottom: 5px;">Learning Reflection</h2>
+
+                            <div style="margin-bottom: 20px;">
+                                <strong style="display: block; margin-bottom: 5px; font-size: 14px; color: #1a2e3e;">Was material/support sufficient?</strong>
+                                <div style="background-color: #ffffff; border: 1px solid #b8b8b8; padding: 10px 15px; border-radius: 4px; font-size: 14px;">
+                                    ${reflectionResponse}
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 20px;">
+                                <strong style="display: block; margin-bottom: 5px; font-size: 14px; color: #1a2e3e;">Key Takeaways / Challenges:</strong>
+                                <div style="background-color: #ffffff; border: 1px solid #b8b8b8; padding: 15px; border-radius: 4px; font-size: 14px; min-height: 100px; white-space: pre-wrap; word-wrap: break-word; vertical-align: top;">${takeaways}</div>
+                            </div>
+
+                            <div style="margin-bottom: 20px;">
+                                <strong style="display: block; margin-bottom: 5px; font-size: 14px; color: #1a2e3e;">What additional material could be created?</strong>
+                                <div style="background-color: #ffffff; border: 1px solid #b8b8b8; padding: 15px; border-radius: 4px; font-size: 14px; min-height: 100px; white-space: pre-wrap; word-wrap: break-word; vertical-align: top;">${suggestions}</div>
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.appendChild(pdfContainer);
+
+                    // Need a slight delay for DOM to render the hidden element
+                    await new Promise(r => setTimeout(r, 100));
+
+                    const canvas = await html2canvas(pdfContainer, {
                         scale: 2,
                         backgroundColor: '#ffffff'
                     });
 
                     const imgData = canvas.toDataURL('image/png');
                     const pdf = new jspdf.jsPDF({
-                        orientation: 'landscape',
+                        orientation: 'portrait',
                         unit: 'px',
                         format: [canvas.width, canvas.height]
                     });
@@ -393,6 +475,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const fileName = `${safeName}_day_${dayNumber}_reflection.pdf`;
 
                     pdf.save(fileName);
+
+                    document.body.removeChild(pdfContainer);
 
                     const subject = encodeURIComponent(`Day ${dayNumber} Reflection - ${candidateName || 'Candidate'}`);
                     const body = encodeURIComponent(`Hello,\n\nPlease find attached my training reflection for Day ${dayNumber}.\n\n(Note: Please remember to manually attach the downloaded PDF: ${fileName})\n\nThank you,\n${candidateName || 'Candidate'}`);
