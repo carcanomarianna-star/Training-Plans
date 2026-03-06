@@ -239,6 +239,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         </tbody>
                     </table>
                 </div>
+                <div class="mt-4 flex justify-end" data-html2canvas-ignore="true">
+                    <button class="submit-week-btn bg-brand-dark hover:bg-brand-darkest text-white text-sm font-semibold py-2 px-4 rounded shadow-sm transition-colors" data-week="${week.weekNumber}">
+                        Export Weekly Summary
+                    </button>
+                </div>
             </div>
         `;
     };
@@ -357,6 +362,19 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        const escapeHTML = (str) => {
+            if (!str) return '';
+            return str.toString().replace(/[&<>'"]/g,
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        };
+
         // Setup Submit Buttons
         document.querySelectorAll('.submit-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
@@ -371,23 +389,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const weekData = scheduleData.find(w => w.weekNumber === weekNumber);
                 const dayData = weekData ? weekData.days.find(d => d.day === dayNumber) : null;
                 const objective = dayData ? dayData.goal : 'No objective found.';
+                const theory = dayData && dayData.theory ? dayData.theory : null;
+                const practice = dayData && dayData.practice ? dayData.practice : null;
 
                 // Extract reflection data from the table row
                 const tr = button.closest('tr');
                 const selectElement = tr.querySelector('select');
                 const textareas = tr.querySelectorAll('textarea');
-
-                const escapeHTML = (str) => {
-                    return str.replace(/[&<>'"]/g,
-                        tag => ({
-                            '&': '&amp;',
-                            '<': '&lt;',
-                            '>': '&gt;',
-                            "'": '&#39;',
-                            '"': '&quot;'
-                        }[tag])
-                    );
-                };
 
                 const reflectionResponse = selectElement && selectElement.options[selectElement.selectedIndex].text !== 'Select response...' ? escapeHTML(selectElement.options[selectElement.selectedIndex].text) : 'No response selected';
                 const takeaways = textareas[0] && textareas[0].value ? escapeHTML(textareas[0].value) : 'None';
@@ -413,6 +421,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const today = new Date().toLocaleDateString();
 
+                    let theoryHTML = '';
+                    if (theory) {
+                        theoryHTML = `
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #b8b8b8;">
+                                <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #989fa7; margin-bottom: 5px;">${escapeHTML(theory.type)}</div>
+                                <div style="font-size: 14px; font-weight: bold; color: #0f131d; margin-bottom: 5px;">${escapeHTML(theory.title)}</div>
+                                <div style="font-size: 13px; color: #1a2e3e; line-height: 1.5;">${theory.description}</div>
+                            </div>
+                        `;
+                    }
+
+                    let practiceHTML = '';
+                    if (practice) {
+                        let practiceHighlightHTML = '';
+                        if (practice.highlightGoal) {
+                            practiceHighlightHTML = `
+                                <div style="margin-top: 10px; padding: 10px; background-color: #e6f0f3; border-left: 3px solid #025267; font-size: 12px; font-weight: bold; color: #025267;">
+                                    ${escapeHTML(practice.highlightGoal)}
+                                </div>
+                            `;
+                        }
+
+                        practiceHTML = `
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #b8b8b8;">
+                                <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #025267; margin-bottom: 5px;">${escapeHTML(practice.type)}</div>
+                                <div style="font-size: 14px; font-weight: bold; color: #0f131d; margin-bottom: 5px;">${escapeHTML(practice.title)}</div>
+                                <div style="font-size: 13px; color: #1a2e3e; line-height: 1.5;">${practice.description}</div>
+                                ${practiceHighlightHTML}
+                            </div>
+                        `;
+                    }
+
                     pdfContainer.innerHTML = `
                         <div style="border-bottom: 4px solid #025267; padding-bottom: 20px; margin-bottom: 30px;">
                             <h1 style="color: #025267; margin: 0; font-size: 28px;">CAD to QA Training Plan</h1>
@@ -426,8 +466,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
 
                         <div style="background-color: #f2f1ef; padding: 20px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #025267;">
-                            <h2 style="margin: 0 0 10px 0; font-size: 18px; color: #0f131d;">Daily Objective</h2>
-                            <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #1a2e3e;">${safeObjective}</p>
+                            <h2 style="margin: 0 0 10px 0; font-size: 18px; color: #0f131d;">Daily Plan Summary</h2>
+                            <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #1a2e3e;"><strong>Goal:</strong> ${safeObjective}</p>
+                            ${theoryHTML}
+                            ${practiceHTML}
                         </div>
 
                         <div style="margin-bottom: 30px;">
@@ -488,6 +530,186 @@ document.addEventListener('DOMContentLoaded', () => {
                 } finally {
                     button.disabled = false;
                     button.textContent = 'Submit';
+                    button.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            });
+        });
+
+        // Setup Weekly Submit Buttons
+        document.querySelectorAll('.submit-week-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const button = e.target;
+                const weekNumber = parseInt(button.getAttribute('data-week'), 10);
+                const tableContainer = document.getElementById(`reflection-table-w${weekNumber}`);
+
+                if (!tableContainer) return;
+
+                const weekData = scheduleData.find(w => w.weekNumber === weekNumber);
+                if (!weekData) return;
+
+                const safeCandidateName = escapeHTML(candidateName || 'Not specified');
+
+                try {
+                    button.disabled = true;
+                    button.textContent = 'Wait...';
+                    button.classList.add('opacity-50', 'cursor-not-allowed');
+
+                    const pdfContainer = document.createElement('div');
+                    pdfContainer.style.position = 'absolute';
+                    pdfContainer.style.left = '-9999px';
+                    pdfContainer.style.top = '0';
+                    pdfContainer.style.width = '800px';
+                    pdfContainer.style.backgroundColor = '#ffffff';
+                    pdfContainer.style.padding = '40px';
+                    pdfContainer.style.fontFamily = 'sans-serif';
+                    pdfContainer.style.color = '#0f131d';
+
+                    const today = new Date().toLocaleDateString();
+
+                    let daysHTML = '';
+
+                    weekData.days.forEach((dayData) => {
+                        const dayNumber = dayData.day;
+                        const objective = dayData.goal || 'No objective found.';
+                        const theory = dayData.theory || null;
+                        const practice = dayData.practice || null;
+
+                        // Find corresponding row in the table
+                        const rows = tableContainer.querySelectorAll('tbody tr');
+                        let tr = null;
+                        rows.forEach(row => {
+                            if (row.querySelector('td').textContent.includes(`Day ${dayNumber}`)) {
+                                tr = row;
+                            }
+                        });
+
+                        let reflectionResponse = 'No response selected';
+                        let takeaways = 'None';
+                        let suggestions = 'None';
+
+                        if (tr) {
+                            const selectElement = tr.querySelector('select');
+                            const textareas = tr.querySelectorAll('textarea');
+                            reflectionResponse = selectElement && selectElement.options[selectElement.selectedIndex].text !== 'Select response...' ? escapeHTML(selectElement.options[selectElement.selectedIndex].text) : 'No response selected';
+                            takeaways = textareas[0] && textareas[0].value ? escapeHTML(textareas[0].value) : 'None';
+                            suggestions = textareas[1] && textareas[1].value ? escapeHTML(textareas[1].value) : 'None';
+                        }
+
+                        let theoryHTML = '';
+                        if (theory) {
+                            theoryHTML = `
+                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #b8b8b8;">
+                                    <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #989fa7; margin-bottom: 5px;">${escapeHTML(theory.type)}</div>
+                                    <div style="font-size: 14px; font-weight: bold; color: #0f131d; margin-bottom: 5px;">${escapeHTML(theory.title)}</div>
+                                    <div style="font-size: 13px; color: #1a2e3e; line-height: 1.5;">${theory.description}</div>
+                                </div>
+                            `;
+                        }
+
+                        let practiceHTML = '';
+                        if (practice) {
+                            let practiceHighlightHTML = '';
+                            if (practice.highlightGoal) {
+                                practiceHighlightHTML = `
+                                    <div style="margin-top: 10px; padding: 10px; background-color: #e6f0f3; border-left: 3px solid #025267; font-size: 12px; font-weight: bold; color: #025267;">
+                                        ${escapeHTML(practice.highlightGoal)}
+                                    </div>
+                                `;
+                            }
+
+                            practiceHTML = `
+                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #b8b8b8;">
+                                    <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #025267; margin-bottom: 5px;">${escapeHTML(practice.type)}</div>
+                                    <div style="font-size: 14px; font-weight: bold; color: #0f131d; margin-bottom: 5px;">${escapeHTML(practice.title)}</div>
+                                    <div style="font-size: 13px; color: #1a2e3e; line-height: 1.5;">${practice.description}</div>
+                                    ${practiceHighlightHTML}
+                                </div>
+                            `;
+                        }
+
+                        daysHTML += `
+                            <div style="page-break-inside: avoid; margin-bottom: 40px; border: 1px solid #b8b8b8; border-radius: 8px; overflow: hidden;">
+                                <div style="background-color: #0f131d; color: #ffffff; padding: 10px 20px; font-weight: bold; font-size: 16px;">
+                                    Day ${dayNumber} - ${escapeHTML(dayData.dayName)}
+                                </div>
+                                <div style="padding: 20px;">
+                                    <div style="background-color: #f2f1ef; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #025267;">
+                                        <h3 style="margin: 0 0 10px 0; font-size: 16px; color: #0f131d;">Plan Summary</h3>
+                                        <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #1a2e3e;"><strong>Goal:</strong> ${escapeHTML(objective)}</p>
+                                        ${theoryHTML}
+                                        ${practiceHTML}
+                                    </div>
+                                    <div>
+                                        <h3 style="margin: 0 0 10px 0; font-size: 16px; color: #0f131d; border-bottom: 1px solid #b8b8b8; padding-bottom: 5px;">Reflection</h3>
+                                        <div style="margin-bottom: 15px;">
+                                            <strong style="display: block; margin-bottom: 3px; font-size: 13px; color: #1a2e3e;">Was material/support sufficient?</strong>
+                                            <div style="font-size: 13px; padding: 8px; background-color: #f9f9f9; border: 1px solid #e5e7eb; border-radius: 4px;">${reflectionResponse}</div>
+                                        </div>
+                                        <div style="margin-bottom: 15px;">
+                                            <strong style="display: block; margin-bottom: 3px; font-size: 13px; color: #1a2e3e;">Key Takeaways / Challenges:</strong>
+                                            <div style="font-size: 13px; padding: 8px; background-color: #f9f9f9; border: 1px solid #e5e7eb; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word;">${takeaways}</div>
+                                        </div>
+                                        <div>
+                                            <strong style="display: block; margin-bottom: 3px; font-size: 13px; color: #1a2e3e;">What additional material could be created?</strong>
+                                            <div style="font-size: 13px; padding: 8px; background-color: #f9f9f9; border: 1px solid #e5e7eb; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word;">${suggestions}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    pdfContainer.innerHTML = `
+                        <div style="border-bottom: 4px solid #025267; padding-bottom: 20px; margin-bottom: 30px;">
+                            <h1 style="color: #025267; margin: 0; font-size: 28px;">CAD to QA Training Plan</h1>
+                            <div style="display: flex; justify-content: space-between; margin-top: 10px; color: #1a2e3e; font-size: 14px; font-weight: bold;">
+                                <span>Week ${weekNumber} Full Summary</span>
+                                <span>Date Exported: ${today}</span>
+                            </div>
+                            <div style="margin-top: 5px; color: #1a2e3e; font-size: 14px;">
+                                <strong>Candidate:</strong> ${safeCandidateName}
+                            </div>
+                        </div>
+
+                        ${daysHTML}
+                    `;
+
+                    document.body.appendChild(pdfContainer);
+
+                    await new Promise(r => setTimeout(r, 100));
+
+                    const canvas = await html2canvas(pdfContainer, {
+                        scale: 2,
+                        backgroundColor: '#ffffff'
+                    });
+
+                    const imgData = canvas.toDataURL('image/png');
+
+                    const pdf = new jspdf.jsPDF({
+                        orientation: 'portrait',
+                        unit: 'px',
+                        format: [canvas.width, canvas.height]
+                    });
+
+                    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+
+                    const safeName = candidateName ? candidateName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'candidate';
+                    const fileName = `${safeName}_week_${weekNumber}_summary.pdf`;
+
+                    pdf.save(fileName);
+
+                    document.body.removeChild(pdfContainer);
+
+                    const subject = encodeURIComponent(`Week ${weekNumber} Summary - ${candidateName || 'Candidate'}`);
+                    const body = encodeURIComponent(`Hello,\n\nPlease find attached my full training summary for Week ${weekNumber}.\n\n(Note: Please remember to manually attach the downloaded PDF: ${fileName})\n\nThank you,\n${candidateName || 'Candidate'}`);
+
+                    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                    alert('Failed to generate PDF summary. Please try again.');
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'Export Weekly Summary';
                     button.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
             });
