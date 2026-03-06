@@ -10,34 +10,46 @@
     <script>
         tailwind.config = {
             theme: {
-                extend: {}
+                extend: {
+                    colors: {
+                        brand: {
+                            white: '#ffffff',
+                            offwhite: '#f2f1ef',
+                            darkest: '#0f131d',
+                            teal: '#025267',
+                            dark: '#1a2e3e',
+                            gray: '#989fa7',
+                            lightgray: '#b8b8b8'
+                        }
+                    }
+                }
             }
         }
     </script>
     <style type="text/tailwindcss">
         @layer base {
             body {
-                @apply antialiased min-h-screen pb-12 bg-slate-50 text-slate-900;
+                @apply antialiased min-h-screen pb-12 bg-brand-offwhite text-brand-darkest;
             }
         }
         @layer components {
             .glass-card {
-                @apply bg-white/95 backdrop-blur-[10px] border border-slate-200/80;
+                @apply bg-white/95 backdrop-blur-[10px] border border-brand-lightgray;
             }
             .gradient-text {
-                @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-emerald-600;
+                @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-teal to-brand-dark;
             }
             .practice-block {
-                @apply mt-2 bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg;
+                @apply mt-2 bg-brand-offwhite border-l-4 border-brand-teal p-3 rounded-r-lg;
             }
             .theory-block {
-                @apply bg-slate-50 border-l-4 border-slate-400 p-3 rounded-r-lg;
+                @apply bg-white border-l-4 border-brand-gray p-3 rounded-r-lg;
             }
             .module-card {
                 @apply transition-transform duration-200 ease-in-out hover:-translate-y-1;
             }
             .reflection-input {
-                @apply border border-slate-300 rounded-md p-2 w-full text-sm transition-colors duration-150 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500;
+                @apply border border-brand-lightgray rounded-md p-2 w-full text-sm transition-colors duration-150 focus:outline-none focus:border-brand-teal focus:ring-1 focus:ring-brand-teal;
             }
         }
     </style>
