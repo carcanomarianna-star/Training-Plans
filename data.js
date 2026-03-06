@@ -3,11 +3,11 @@ const curriculumData = [
   {
     id: 'stds',
     icon: '📘',
-    title: 'Deliverables & Stds',
+    title: 'CAD Standards',
     subtitle: 'Core Foundation',
     themeColor: 'blue',
     bullets: [
-      'Deliverable Types (SF1/RL5)',
+      'Deliverable Types',
       'AutoCAD Naming & UNICLASS',
       'Border Templates & Routines',
     ],
@@ -15,13 +15,13 @@ const curriculumData = [
   {
     id: 'pc',
     icon: '☁️',
-    title: 'Point Cloud Workflows',
-    subtitle: 'Cloudworx (AC03)',
+    title: 'AutoCAD Practice ',
+    subtitle: 'Cloudworx ',
     themeColor: 'purple',
     bullets: [
       '<strong>AC03.01-02:</strong> License, DB, UI',
-      '<strong>AC03.04-06:</strong> Slices & UCS',
-      '<strong>AC03.10:</strong> Clipping & Linework Trick',
+      '<strong>AC03.04-06:</strong> Alignment & UCS',
+      '<strong>AC03.08-28:</strong> Drafting Guidance',
     ],
   },
   {
@@ -31,21 +31,21 @@ const curriculumData = [
     subtitle: 'Quality Assurance',
     themeColor: 'emerald',
     bullets: [
-      'Validating Border Details',
-      'Running Automated Routines',
-      'Archives & Record Sheets',
+      'Presentation Review',
+      'Specification Checklist',
+      'QA Routines',
     ],
   },
   {
     id: 'rev6',
     icon: '📄',
-    title: 'Rev 6 Guidelines',
-    subtitle: 'QA Principles',
+    title: 'QA Principles',
+    subtitle: 'Final Touches',
     themeColor: 'orange',
     bullets: [
       'Consistency & Fit for Purpose',
-      'Accuracy & Floor Stacking',
-      '2D Spec Checklists (p.21-28)',
+      'Validating Border Details',
+      'Archives & Record Sheets',
     ],
   },
 ];
@@ -64,16 +64,16 @@ const scheduleData = [
         themeColor: 'blue',
         goal: 'Familiarize with standards, deliverable types, and UNICLASS layers.',
         theory: {
-          type: 'Theory (Stds)',
+          type: 'Theory',
           themeColor: 'slate',
           title: 'Standards & Checklists',
-          description: 'Review SF1/RL5 types and the fundamental CAD QA Checklist. Study AutoCAD Naming, UNICLASS layers, PCLayer routine, and Borders.',
+          description: 'Review deliverable types and the CAD QA Checklists. Study AutoCAD Naming, UNICLASS layers, PCLayer routine.',
         },
         practice: {
           type: 'Practice',
           themeColor: 'blue',
           title: 'Layer 0 Correction',
-          description: 'Identify deliverable types from 3 past projects. <strong>Receive a drawing with all linework on Layer 0.</strong> Run PCLayer, correctly assign lines to UNICLASS layers, and insert/edit a PCL Border.',
+          description: 'Identify deliverable types from 3 past projects. <strong>Receive a drawing with all linework on Layer 0.</strong> Run PCLayer, correctly assign lines to UNICLASS layers using Layer Finder.',
         },
       },
       {
@@ -82,10 +82,10 @@ const scheduleData = [
         themeColor: 'blue',
         goal: 'Practice handling point clouds to draft missing 2D elements.',
         theory: {
-          type: 'Videos (AC03.01 & 02)',
+          type: 'Knowledge Hub',
           themeColor: 'purple',
-          title: 'Cyclone UI & DBs',
-          description: 'License Manager, DB Import, Toolbar, PC VPORTS, Point cloud colours, and Visibility.',
+          title: 'Basic Drafting',
+          description: 'Cloudworx Toolbar, PC Routines, Drafting, Layers.',
         },
         practice: {
           type: 'Practice',
@@ -100,7 +100,7 @@ const scheduleData = [
         themeColor: 'blue',
         goal: 'Practice advanced point cloud handling for complex 3D elements & UCS.',
         theory: {
-          type: 'Videos (AC03.04-10)',
+          type: 'Knowledge Hub',
           themeColor: 'purple',
           title: 'UCS & Slicing Tools',
           description: 'Matching & Creating UCS. Vertical slices, Clipping Manager, and the View Linework Trick.',
@@ -121,7 +121,7 @@ const scheduleData = [
           type: 'Theory (QA Rev 6)',
           themeColor: 'emerald',
           title: 'Principles & Specs',
-          description: 'Study <strong>QA Guidelines Rev 6</strong>. Focus on Consistency, Accuracy (floor stacking), and Fit for Purpose. Review Grids, North Points, and the 2D Spec Checklist (p.21-28).',
+          description: 'Study <strong>QA Guidelines Rev 6</strong>. Focus on Consistency, Accuracy, and Fit for Purpose. Review Grids, North Points, and the 2D Spec Checklist (p.21-28).',
         },
         practice: {
           type: 'Practice',
@@ -166,7 +166,7 @@ const scheduleData = [
           themeColor: 'emerald',
           title: 'Seeded Mock Audit',
           description: 'Receive a drawing intentionally seeded with critical errors spanning Layers, Bad UCS/Slicing, missing linework, and invalid Border data.',
-          highlightGoal: 'Goal: Identify, document, and fix errors.',
+          highlightGoal: 'Goal: Identify and document errors.',
         },
       },
       {

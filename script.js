@@ -54,13 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             <img src="No background.png" alt="Primary Logo" class="h-12 object-contain" onerror="this.style.display='none'">
                         </div>
                         <p class="text-brand-teal font-bold tracking-widest uppercase text-sm mb-2">
-                            Accelerated CAD to QA Pipeline
+                            CAD to QA Training Pipeline
                         </p>
                         <h1 class="text-4xl md:text-5xl font-extrabold mb-4 text-brand-darkest">
                             10-Day QA Readiness Plan
                         </h1>
                         <p class="text-brand-dark max-w-2xl text-lg font-medium">
-                            A highly condensed intensive program mapped perfectly across two standard Monday-Friday work weeks. Progresses from deliverable basics to robust QA auditing, culminating in project meetings, live project production, and sign-off.
+                            A strategic program mapped across two standard Monday-Friday work weeks. Progresses from deliverable basics to robust QA auditing, culminating in project meetings, live project production, and sign-off.
                         </p>
                     </div>
                     <div class="flex flex-col items-end gap-6 w-full md:w-auto">
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="text-center mb-10 mt-8">
                     <h2 class="text-3xl font-bold text-brand-darkest">Curriculum Architecture</h2>
                     <p class="text-brand-gray mt-2 max-w-2xl mx-auto">
-                        The daily schedule focuses specifically on these foundational topics and AC03 video modules extracted from the primary CAD Training Program.
+                        The daily schedule focuses specifically on these foundational topics and is balanced with exercises to practice drafting techniques while familiarising with Plowman Craven stadards.
                     </p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -227,10 +227,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <tr class="${bgClass} ${textClass} text-xs uppercase tracking-wide border-b ${borderClass}">
                                 <th class="p-3 font-semibold w-24">Day</th>
                                 <th class="p-3 font-semibold w-1/4">
-                                    ${isWeek1 ? "Was material sufficient?" : "Was support sufficient?"}
+                                    ${isWeek1 ? "Was the support received sufficient?" : "Was the support received sufficient?"}
                                 </th>
                                 <th class="p-3 font-semibold w-1/3">Key Takeaways / Challenges</th>
-                                <th class="p-3 font-semibold">What additional material could be created?</th>
+                                <th class="p-3 font-semibold">What additional supporting material could be created?</th>
                                 <th class="p-3 font-semibold w-24 text-center" data-html2canvas-ignore="true">Action</th>
                             </tr>
                         </thead>
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="text-center my-12">
                     <h2 class="text-3xl font-bold gradient-text">The 10-Day Execution Plan</h2>
                     <p class="text-brand-gray mt-2 max-w-2xl mx-auto">
-                        Structured perfectly over two calendar weeks. Week 1 establishes foundations and automated routines. Week 2 tests those skills on broken drawings and transitions to sustained live project production.
+                        Structured over two calendar weeks. Week 1 establishes foundations and drafting principles. Week 2 tests those skills on broken drawings and transitions to sustained live project production.
                     </p>
                 </div>
 
