@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ` : '';
 
         const practiceHTML = `
-            <div class="practice-block mt-auto text-xs flex-grow flex flex-col justify-end border-l-4 border-brand-teal">
+            <div class="practice-block mt-auto text-xs flex-grow flex flex-col justify-start border-l-4 border-brand-teal">
                 <div class="${practiceColors.text} font-bold uppercase tracking-wider mb-1 text-[10px]">${day.practice.type}</div>
                 <div class="font-semibold text-brand-darkest mb-1">${day.practice.title}</div>
                 <div class="text-brand-dark leading-relaxed">${day.practice.description}</div>
@@ -156,11 +156,19 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         ` : '';
 
+        let cardBgClass = 'bg-white';
+        let specialIcon = '';
+        if (day.day === 8) {
+            cardBgClass = 'bg-gradient-to-br from-white to-orange-100/50';
+            specialIcon = '<span class="text-xl" title="Team Participation">👥</span>';
+        }
+
         return `
-            <div class="flex flex-col h-full bg-white rounded-lg p-4 border border-brand-lightgray hover:shadow-md transition-shadow relative">
+            <div class="flex flex-col h-full ${cardBgClass} rounded-lg p-4 border border-brand-lightgray hover:shadow-md transition-shadow relative">
                 ${medalHTML}
-                <h4 class="${titleColors.text} font-bold text-lg border-b ${titleColors.border} pb-2 mb-3">
-                    Day ${day.day} (${day.dayName})
+                <h4 class="${titleColors.text} font-bold text-lg border-b ${titleColors.border} pb-2 mb-3 flex items-center justify-between">
+                    <span>Day ${day.day} (${day.dayName})</span>
+                    ${specialIcon}
                 </h4>
                 <div class="text-xs text-brand-dark italic mb-2 flex gap-1.5 items-start">
                     <span class="text-brand-teal mt-0.5">🎯</span>
