@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased min-h-screen pb-12 bg-slate-50 text-slate-900;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/95 backdrop-blur-[10px] border border-slate-200/80;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-emerald-600;
+  }
+
+  .practice-block {
+    @apply mt-2 bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg;
+  }
+
+  .theory-block {
+    @apply bg-slate-50 border-l-4 border-slate-400 p-3 rounded-r-lg;
+  }
+
+  .module-card {
+    @apply transition-transform duration-200 ease-in-out hover:-translate-y-1;
+  }
+
+  .reflection-input {
+    @apply border border-slate-300 rounded-md p-2 w-full text-sm transition-colors duration-150 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500;
+  }
+}
