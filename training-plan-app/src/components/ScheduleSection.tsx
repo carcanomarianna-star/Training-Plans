@@ -5,9 +5,10 @@ import ReflectionTable from './ReflectionTable';
 
 interface Props {
   data: WeekData;
+  candidateName: string;
 }
 
-const ScheduleSection: React.FC<Props> = ({ data }) => {
+const ScheduleSection: React.FC<Props> = ({ data, candidateName }) => {
   const isWeek1 = data.weekNumber === 1;
   const headerBg = isWeek1 ? 'bg-blue-600' : 'bg-emerald-600';
   const headerText = isWeek1 ? 'text-blue-100' : 'text-emerald-100';
@@ -33,7 +34,7 @@ const ScheduleSection: React.FC<Props> = ({ data }) => {
         </div>
       </div>
 
-      <ReflectionTable week={data} />
+      <ReflectionTable week={data} candidateName={candidateName} />
     </section>
   );
 };
