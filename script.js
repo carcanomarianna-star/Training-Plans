@@ -122,11 +122,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderDayCard = (day) => {
         const titleColors = getThemeColors(day.themeColor);
 
+        const isWeek1 = day.day <= 5;
+
         let theoryHTML = '';
         if (day.theory) {
             const theoryColors = getThemeColors(day.theory.themeColor);
             theoryHTML = `
-                <div class="theory-block mt-4 text-xs">
+                <div class="theory-block mt-4 text-xs ${isWeek1 ? 'flex-1' : ''}">
                     <div class="${theoryColors.text} font-bold uppercase tracking-wider mb-1 text-[10px]">${day.theory.type}</div>
                     <div class="font-semibold text-brand-darkest mb-1">${day.theory.title}</div>
                     <div class="text-brand-dark leading-relaxed">${day.theory.description}</div>
@@ -142,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ` : '';
 
         const practiceHTML = `
-            <div class="practice-block mt-auto text-xs flex-grow flex flex-col justify-start border-l-4 border-brand-teal">
+            <div class="practice-block ${isWeek1 ? 'mt-4 flex-1' : 'mt-auto flex-grow'} text-xs flex flex-col justify-start border-l-4 border-brand-teal pl-2">
                 <div class="${practiceColors.text} font-bold uppercase tracking-wider mb-1 text-[10px]">${day.practice.type}</div>
                 <div class="font-semibold text-brand-darkest mb-1">${day.practice.title}</div>
                 <div class="text-brand-dark leading-relaxed">${day.practice.description}</div>
