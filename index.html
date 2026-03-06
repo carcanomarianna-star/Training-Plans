@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10-Day QA Readiness Plan</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {}
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply antialiased min-h-screen pb-12 bg-slate-50 text-slate-900;
+            }
+        }
+        @layer components {
+            .glass-card {
+                @apply bg-white/95 backdrop-blur-[10px] border border-slate-200/80;
+            }
+            .gradient-text {
+                @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-emerald-600;
+            }
+            .practice-block {
+                @apply mt-2 bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg;
+            }
+            .theory-block {
+                @apply bg-slate-50 border-l-4 border-slate-400 p-3 rounded-r-lg;
+            }
+            .module-card {
+                @apply transition-transform duration-200 ease-in-out hover:-translate-y-1;
+            }
+            .reflection-input {
+                @apply border border-slate-300 rounded-md p-2 w-full text-sm transition-colors duration-150 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500;
+            }
+        }
+    </style>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app"></div>
+
+    <!-- Data and Application Logic -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
