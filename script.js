@@ -190,15 +190,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const textClass = 'text-brand-darkest';
         const borderClass = 'border-brand-lightgray';
 
-        const candidateSpan = candidateName ? `<span class="text-sm font-normal text-brand-darkest bg-brand-lightgray px-2 py-1 rounded-md ml-auto">Candidate: ${candidateName}</span>` : '';
-
         const rowsHTML = week.days.map((day, index) => {
             const isLast = index === week.days.length - 1;
             return `
                 <tr class="border-brand-lightgray hover:bg-brand-offwhite align-top ${!isLast ? 'border-b' : ''}">
                     <td class="p-3 font-semibold text-brand-darkest">Day ${day.day}</td>
                     <td class="p-3">
-                        <select class="reflection-input bg-white">
+                        <select class="reflection-input bg-white" id="reflection-select-w${week.weekNumber}-d${day.day}">
                             <option value="" disabled selected>Select response...</option>
                             <option value="1">Yes, completely clear</option>
                             <option value="2">Mostly, but had questions</option>
@@ -206,10 +204,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         </select>
                     </td>
                     <td class="p-3">
-                        <textarea class="reflection-input resize-y min-h-[60px]" rows="3" placeholder="Add your notes here..."></textarea>
+                        <textarea class="reflection-input resize-y min-h-[60px]" id="reflection-notes-w${week.weekNumber}-d${day.day}" rows="3" placeholder="Add your notes here..."></textarea>
                     </td>
                     <td class="p-3">
-                        <textarea class="reflection-input resize-y min-h-[60px]" rows="3" placeholder="Suggestions for new guides/videos..."></textarea>
+                        <textarea class="reflection-input resize-y min-h-[60px]" id="reflection-suggestions-w${week.weekNumber}-d${day.day}" rows="3" placeholder="Suggestions for new guides/videos..."></textarea>
                     </td>
                     <td class="p-3 text-center" data-html2canvas-ignore="true">
                         <button class="submit-btn bg-brand-teal hover:bg-brand-dark text-white text-xs font-semibold py-1.5 px-3 rounded shadow-sm transition-colors" data-day="${day.day}" data-week="${week.weekNumber}">
@@ -222,10 +220,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return `
             <div class="bg-brand-offwhite border-x border-b border-brand-lightgray rounded-b-xl p-6 shadow-sm reflection-table-container" id="reflection-table-w${week.weekNumber}">
-                <h4 class="text-lg font-bold text-brand-darkest mb-3 flex flex-wrap items-center gap-2">
-                    <span>📝 Week ${week.weekNumber} Learning Reflection</span>
-                    <span class="candidate-display ml-auto">${candidateSpan}</span>
-                </h4>
+                <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-3">
+                    <h4 class="text-lg font-bold text-brand-darkest flex items-center gap-2 mt-2">
+                        <span>📝 Week ${week.weekNumber} Learning Reflection</span>
+                    </h4>
+
+                    <div class="flex flex-col items-end gap-2" data-html2canvas-ignore="true">
+                        <div class="flex items-center gap-2">
+                            <label for="candidateNameInput-w${week.weekNumber}" class="font-bold text-brand-darkest text-sm whitespace-nowrap">
+                                Candidate Name:
+                            </label>
+                            <input
+                                type="text"
+                                id="candidateNameInput-w${week.weekNumber}"
+                                class="candidate-name-input px-3 py-1.5 text-sm border border-brand-lightgray rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-teal w-48"
+                                placeholder="Enter your name..."
+                                value="${candidateName || ''}"
+                            />
+                        </div>
+                        <button class="save-progress-btn bg-brand-darkest hover:bg-brand-teal text-white text-xs font-semibold py-1.5 px-4 rounded shadow-sm transition-colors" id="save-progress-w${week.weekNumber}">
+                            Save Progress
+                        </button>
+                    </div>
+                </div>
                 <p class="text-xs text-brand-dark mb-4">
                     ${isWeek1
                         ? "Complete this table at the end of each day to provide feedback on the training materials and identify areas for improvement."
@@ -320,24 +337,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Main App Renderer
     const renderApp = () => {
+        // Load data from localStorage on start
+        const savedData = localStorage.getItem('trainingPlanProgress');
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                candidateName = parsed.candidateName || '';
+            } catch (e) {
+                console.error('Error parsing saved progress', e);
+            }
+        }
+
         app.innerHTML = `
             ${renderHeader()}
             <main class="max-w-7xl mx-auto px-6 mt-10 space-y-12">
                 ${renderCurriculumSection()}
 
-                <div class="bg-white p-6 rounded-xl shadow-md border border-brand-lightgray mt-12 max-w-2xl mx-auto flex items-center gap-4">
-                    <label for="candidateNameInput" class="font-bold text-brand-darkest whitespace-nowrap">
-                        Candidate Name:
-                    </label>
-                    <input
-                        type="text"
-                        id="candidateNameInput"
-                        class="flex-1 px-4 py-2 border border-brand-lightgray rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-teal"
-                        placeholder="Enter candidate's name..."
-                    />
-                </div>
-
-                <div class="text-center my-12">
+                <div class="text-center my-12 pt-8 border-t border-brand-lightgray">
                     <h2 class="text-3xl font-bold gradient-text">The 10-Day Execution Plan</h2>
                     <p class="text-brand-gray mt-2 max-w-2xl mx-auto">
                         Structured over two calendar weeks. Week 1 establishes foundations and drafting principles. Week 2 tests those skills on broken drawings and transitions to sustained live project production.
@@ -358,16 +374,106 @@ document.addEventListener('DOMContentLoaded', () => {
             </main>
         `;
 
-        // Setup Event Listeners
-        const nameInput = document.getElementById('candidateNameInput');
-        nameInput.addEventListener('input', (e) => {
-            candidateName = e.target.value;
-            const displays = document.querySelectorAll('.candidate-display');
-            displays.forEach(display => {
-                if (candidateName) {
-                    display.innerHTML = `<span class="text-sm font-normal text-brand-darkest bg-brand-lightgray px-2 py-1 rounded-md ml-auto">Candidate: ${candidateName}</span>`;
-                } else {
-                    display.innerHTML = '';
+        // Helper function to save progress to localStorage
+        const saveProgress = () => {
+            const progressData = {
+                candidateName: candidateName,
+                reflections: {}
+            };
+
+            scheduleData.forEach(week => {
+                week.days.forEach(day => {
+                    const select = document.getElementById(`reflection-select-w${week.weekNumber}-d${day.day}`);
+                    const notes = document.getElementById(`reflection-notes-w${week.weekNumber}-d${day.day}`);
+                    const suggestions = document.getElementById(`reflection-suggestions-w${week.weekNumber}-d${day.day}`);
+
+                    if (select || notes || suggestions) {
+                        progressData.reflections[`w${week.weekNumber}-d${day.day}`] = {
+                            select: select ? select.value : '',
+                            notes: notes ? notes.value : '',
+                            suggestions: suggestions ? suggestions.value : ''
+                        };
+                    }
+                });
+            });
+
+            localStorage.setItem('trainingPlanProgress', JSON.stringify(progressData));
+        };
+
+        // Populate saved data into fields
+        const populateSavedData = () => {
+            const savedData = localStorage.getItem('trainingPlanProgress');
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    if (parsed.reflections) {
+                        Object.keys(parsed.reflections).forEach(key => {
+                            const data = parsed.reflections[key];
+                            // Parse week and day from key (e.g., 'w1-d1')
+                            const match = key.match(/w(\d+)-d(\d+)/);
+                            if (match) {
+                                const weekNum = match[1];
+                                const dayNum = match[2];
+
+                                const select = document.getElementById(`reflection-select-w${weekNum}-d${dayNum}`);
+                                const notes = document.getElementById(`reflection-notes-w${weekNum}-d${dayNum}`);
+                                const suggestions = document.getElementById(`reflection-suggestions-w${weekNum}-d${dayNum}`);
+
+                                if (select && data.select) select.value = data.select;
+                                if (notes && data.notes) notes.value = data.notes;
+                                if (suggestions && data.suggestions) suggestions.value = data.suggestions;
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error populating saved progress', e);
+                }
+            }
+        };
+
+        populateSavedData();
+
+        // Setup Event Listeners for Candidate Name synchronization
+        const nameInputs = document.querySelectorAll('.candidate-name-input');
+        nameInputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                candidateName = e.target.value;
+                nameInputs.forEach(otherInput => {
+                    if (otherInput !== input) {
+                        otherInput.value = candidateName;
+                    }
+                });
+            });
+        });
+
+        // Setup Event Listeners for Save Progress buttons
+        document.querySelectorAll('.save-progress-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const button = e.target;
+                const originalText = button.textContent;
+
+                try {
+                    saveProgress();
+                    button.textContent = '✓ Saved!';
+                    button.classList.remove('bg-brand-darkest', 'hover:bg-brand-teal');
+                    button.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+
+                    setTimeout(() => {
+                        button.textContent = 'Save Progress';
+                        button.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+                        button.classList.add('bg-brand-darkest', 'hover:bg-brand-teal');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Save failed:', err);
+                    button.textContent = 'Error Saving';
+                    button.classList.remove('bg-brand-darkest', 'hover:bg-brand-teal');
+                    button.classList.add('bg-red-600', 'hover:bg-red-700');
+
+                    setTimeout(() => {
+                        button.textContent = 'Save Progress';
+                        button.classList.remove('bg-red-600', 'hover:bg-red-700');
+                        button.classList.add('bg-brand-darkest', 'hover:bg-brand-teal');
+                    }, 2000);
                 }
             });
         });
