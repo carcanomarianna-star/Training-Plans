@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10-Day QA Readiness Plan</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            white: '#ffffff',
+                            offwhite: '#f2f1ef',
+                            darkest: '#0f131d',
+                            teal: '#025267',
+                            dark: '#1a2e3e',
+                            gray: '#989fa7',
+                            lightgray: '#b8b8b8'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply antialiased min-h-screen pb-12 bg-brand-offwhite text-brand-darkest;
+            }
+        }
+        @layer components {
+            .glass-card {
+                @apply bg-white/95 backdrop-blur-[10px] border border-brand-lightgray;
+            }
+            .gradient-text {
+                @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-teal to-brand-dark;
+            }
+            .practice-block {
+                @apply mt-2 bg-brand-offwhite border-l-4 border-brand-teal p-3 rounded-r-lg;
+            }
+            .theory-block {
+                @apply bg-white border-l-4 border-brand-gray p-3 rounded-r-lg;
+            }
+            .module-card {
+                @apply transition-transform duration-200 ease-in-out hover:-translate-y-1;
+            }
+            .reflection-input {
+                @apply border border-brand-lightgray rounded-md p-2 w-full text-sm transition-colors duration-150 focus:outline-none focus:border-brand-teal focus:ring-1 focus:ring-brand-teal;
+            }
+        }
+    </style>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app"></div>
+
+    <!-- Data and Application Logic -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

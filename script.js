@@ -1,0 +1,928 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const app = document.getElementById('app');
+    let candidateName = '';
+
+    // Helpers
+    const getThemeColors = (themeColor) => {
+        const colors = {
+            blue: {
+                bg: 'bg-brand-offwhite',
+                border: 'border-brand-lightgray',
+                text: 'text-brand-darkest',
+                borderTop: 'border-t-brand-teal',
+                dot: 'bg-brand-teal'
+            },
+            purple: {
+                bg: 'bg-brand-offwhite',
+                border: 'border-brand-lightgray',
+                text: 'text-brand-darkest',
+                borderTop: 'border-t-brand-dark',
+                dot: 'bg-brand-dark'
+            },
+            emerald: {
+                bg: 'bg-brand-offwhite',
+                border: 'border-brand-lightgray',
+                text: 'text-brand-darkest',
+                borderTop: 'border-t-brand-teal',
+                dot: 'bg-brand-teal'
+            },
+            orange: {
+                bg: 'bg-brand-offwhite',
+                border: 'border-brand-lightgray',
+                text: 'text-brand-darkest',
+                borderTop: 'border-t-brand-gray',
+                dot: 'bg-brand-gray'
+            },
+            slate: {
+                bg: 'bg-brand-offwhite',
+                border: 'border-brand-lightgray',
+                text: 'text-brand-darkest',
+                borderTop: 'border-t-brand-darkest',
+                dot: 'bg-brand-darkest'
+            }
+        };
+        return colors[themeColor] || colors.blue;
+    };
+
+    // Components
+    const renderHeader = () => `
+        <header class="bg-[#b2cfe1] text-brand-900 py-12 px-6 shadow-xl border-b-4 border-brand-teal">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative">
+                    <div class="text-center md:text-left w-full md:w-auto flex-grow">
+                        <div class="flex flex-col md:hidden justify-center items-center mb-6 w-full">
+                            <img src="No background.png" alt="Primary Logo" class="h-12 object-contain" onerror="this.style.display='none'">
+                        </div>
+                        <p class="text-brand-teal font-bold tracking-widest uppercase text-sm mb-2">
+                            CAD to QA Training Pipeline
+                        </p>
+                        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 text-brand-darkest">
+                            10-Day QA Readiness Plan
+                        </h1>
+                        <p class="text-brand-dark max-w-2xl text-lg font-medium">
+                            A strategic program mapped across two standard Monday-Friday work weeks. Progresses from deliverable basics to robust QA auditing, culminating in project meetings, live project production, and sign-off.
+                        </p>
+                    </div>
+                    <div class="flex flex-col items-end gap-6 w-full md:w-auto">
+                        <div class="hidden md:block">
+                            <img src="No background.png" alt="Primary Logo" class="h-12 object-contain" onerror="this.style.display='none'">
+                        </div>
+                        <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl border border-white/50 text-center min-w-[250px] shadow-sm w-full md:w-auto">
+                            <div class="text-4xl mb-2">⚡</div>
+                            <div class="text-xl font-extrabold text-brand-teal">10 Working Days</div>
+                            <div class="text-sm text-brand-dark uppercase tracking-wide font-bold">Two Standard Weeks</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    `;
+
+    const renderCurriculumSection = () => {
+        const cardsHTML = curriculumData.map(item => {
+            const colors = getThemeColors(item.themeColor);
+            return `
+                <div class="glass-card rounded-xl p-6 module-card shadow-sm border-t-4 ${colors.borderTop}">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="${colors.bg} ${colors.text} p-3 rounded-lg text-2xl shadow-inner border ${colors.border}">
+                            ${item.icon}
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-brand-darkest leading-tight">${item.title}</h3>
+                            <p class="${colors.text} text-xs font-semibold uppercase tracking-wider mt-1">${item.subtitle}</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-3">
+                        ${item.bullets.map(bullet => `
+                            <li class="flex items-start gap-2 text-sm text-brand-dark">
+                                <span class="w-1.5 h-1.5 rounded-full ${colors.dot} mt-1.5 shrink-0"></span>
+                                <span>${bullet}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <section class="mb-12">
+                <div class="text-center mb-10 mt-8">
+                    <h2 class="text-3xl font-bold text-brand-darkest">Curriculum Architecture</h2>
+                    <p class="text-brand-gray mt-2 max-w-2xl mx-auto">
+                        The daily schedule focuses specifically on these foundational topics and is balanced with exercises to practice drafting techniques while familiarising with Plowman Craven stadards.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    ${cardsHTML}
+                </div>
+            </section>
+        `;
+    };
+
+    const renderDayCard = (day) => {
+        const titleColors = getThemeColors(day.themeColor);
+
+        const isWeek1 = day.day <= 5;
+
+        let theoryHTML = '';
+        if (day.theory) {
+            const theoryColors = getThemeColors(day.theory.themeColor);
+            theoryHTML = `
+                <div class="theory-block mt-4 text-xs ${isWeek1 ? 'flex-1' : ''}">
+                    <div class="${theoryColors.text} font-bold uppercase tracking-wider mb-1 text-[10px]">${day.theory.type}</div>
+                    <div class="font-semibold text-brand-darkest mb-1">${day.theory.title}</div>
+                    <div class="text-brand-dark leading-relaxed">${day.theory.description}</div>
+                </div>
+            `;
+        }
+
+        const practiceColors = getThemeColors(day.practice.themeColor);
+        let practiceHighlight = day.practice.highlightGoal ? `
+            <div class="${practiceColors.bg} ${practiceColors.text} p-2 rounded mt-2 text-[11px] font-semibold border ${practiceColors.border}">
+                ${day.practice.highlightGoal}
+            </div>
+        ` : '';
+
+        const practiceHTML = `
+            <div class="practice-block ${isWeek1 ? 'mt-4 flex-1' : 'mt-auto flex-grow'} text-xs flex flex-col justify-start border-l-4 border-brand-teal pl-2">
+                <div class="${practiceColors.text} font-bold uppercase tracking-wider mb-1 text-[10px]">${day.practice.type}</div>
+                <div class="font-semibold text-brand-darkest mb-1">${day.practice.title}</div>
+                <div class="text-brand-dark leading-relaxed">${day.practice.description}</div>
+                ${practiceHighlight}
+            </div>
+        `;
+
+        const medalHTML = day.hasMedal ? `
+            <div class="absolute -top-3 -right-3 text-3xl drop-shadow-md z-10" title="Sign-off Milestone">
+                🎖️
+            </div>
+        ` : '';
+
+        let cardBgClass = 'bg-white';
+        let specialIcon = '';
+        if (day.day === 8) {
+            cardBgClass = 'bg-gradient-to-br from-white to-orange-100/50';
+            specialIcon = '<span class="text-xl" title="Team Participation">👥</span>';
+        }
+
+        return `
+            <div class="flex flex-col h-full ${cardBgClass} rounded-lg p-4 border border-brand-lightgray hover:shadow-md transition-shadow relative">
+                ${medalHTML}
+                <h4 class="${titleColors.text} font-bold text-lg border-b ${titleColors.border} pb-2 mb-3 flex items-center justify-between">
+                    <span>Day ${day.day} (${day.dayName})</span>
+                    ${specialIcon}
+                </h4>
+                <div class="text-xs text-brand-dark italic mb-2 flex gap-1.5 items-start">
+                    <span class="text-brand-teal mt-0.5">🎯</span>
+                    <span class="leading-tight">Goal: ${day.goal}</span>
+                </div>
+                <div class="flex-grow flex flex-col">
+                    ${theoryHTML}
+                    ${practiceHTML}
+                </div>
+            </div>
+        `;
+    };
+
+    const renderReflectionTable = (week) => {
+        const isWeek1 = week.weekNumber === 1;
+        const bgClass = 'bg-brand-offwhite';
+        const textClass = 'text-brand-darkest';
+        const borderClass = 'border-brand-lightgray';
+
+        const rowsHTML = week.days.map((day, index) => {
+            const isLast = index === week.days.length - 1;
+            return `
+                <tr class="border-brand-lightgray hover:bg-brand-offwhite align-top ${!isLast ? 'border-b' : ''}">
+                    <td class="p-3 font-semibold text-brand-darkest">Day ${day.day}</td>
+                    <td class="p-3">
+                        <select class="reflection-input bg-white" id="reflection-select-w${week.weekNumber}-d${day.day}">
+                            <option value="" disabled selected>Select response...</option>
+                            <option value="1">Yes, completely clear</option>
+                            <option value="2">Mostly, but had questions</option>
+                            <option value="3">No, needed more guidance</option>
+                        </select>
+                    </td>
+                    <td class="p-3">
+                        <textarea class="reflection-input resize-y min-h-[60px]" id="reflection-notes-w${week.weekNumber}-d${day.day}" rows="3" placeholder="Add your notes here..."></textarea>
+                    </td>
+                    <td class="p-3">
+                        <textarea class="reflection-input resize-y min-h-[60px]" id="reflection-suggestions-w${week.weekNumber}-d${day.day}" rows="3" placeholder="Suggestions for new guides/videos..."></textarea>
+                    </td>
+                    <td class="p-3 text-center" data-html2canvas-ignore="true">
+                        <button class="submit-btn bg-brand-teal hover:bg-brand-dark text-white text-xs font-semibold py-1.5 px-3 rounded shadow-sm transition-colors" data-day="${day.day}" data-week="${week.weekNumber}">
+                            Submit
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        return `
+            <div class="bg-brand-offwhite border-x border-b border-brand-lightgray rounded-b-xl p-6 shadow-sm reflection-table-container" id="reflection-table-w${week.weekNumber}">
+                <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-3">
+                    <h4 class="text-lg font-bold text-brand-darkest flex items-center gap-2 mt-2">
+                        <span>📝 Week ${week.weekNumber} Learning Reflection</span>
+                    </h4>
+
+                    <div class="flex flex-col items-end gap-2" data-html2canvas-ignore="true">
+                        <div class="flex items-center gap-2">
+                            <label for="candidateNameInput-w${week.weekNumber}" class="font-bold text-brand-darkest text-sm whitespace-nowrap">
+                                Candidate Name:
+                            </label>
+                            <input
+                                type="text"
+                                id="candidateNameInput-w${week.weekNumber}"
+                                class="candidate-name-input px-3 py-1.5 text-sm border border-brand-lightgray rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-teal w-48"
+                                placeholder="Enter your name..."
+                                value="${candidateName || ''}"
+                            />
+                        </div>
+                        <button class="save-progress-btn bg-brand-darkest hover:bg-brand-teal text-white text-xs font-semibold py-1.5 px-4 rounded shadow-sm transition-colors" id="save-progress-w${week.weekNumber}">
+                            Save Progress
+                        </button>
+                    </div>
+                </div>
+                <p class="text-xs text-brand-dark mb-4">
+                    ${isWeek1
+                        ? "Complete this table at the end of each day to provide feedback on the training materials and identify areas for improvement."
+                        : "Complete this table at the end of each day to provide feedback on the live environment transition and training effectiveness."}
+                </p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse bg-white shadow-sm rounded-lg overflow-hidden">
+                        <thead>
+                            <tr class="${bgClass} ${textClass} text-xs uppercase tracking-wide border-b ${borderClass}">
+                                <th class="p-3 font-semibold w-24">Day</th>
+                                <th class="p-3 font-semibold w-1/4">
+                                    ${isWeek1 ? "Was the support received sufficient?" : "Was the support received sufficient?"}
+                                </th>
+                                <th class="p-3 font-semibold w-1/3">Key Takeaways / Challenges</th>
+                                <th class="p-3 font-semibold">What additional supporting material could be created?</th>
+                                <th class="p-3 font-semibold w-24 text-center" data-html2canvas-ignore="true">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm text-brand-darkest">
+                            ${rowsHTML}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 flex justify-end" data-html2canvas-ignore="true">
+                    <button class="submit-week-btn bg-brand-dark hover:bg-brand-darkest text-white text-sm font-semibold py-2 px-4 rounded shadow-sm transition-colors" data-week="${week.weekNumber}">
+                        Export Weekly Summary
+                    </button>
+                </div>
+            </div>
+        `;
+    };
+
+    const renderScheduleSection = (data) => {
+        const isWeek1 = data.weekNumber === 1;
+        const headerBg = isWeek1 ? 'bg-brand-teal' : 'bg-brand-dark';
+        const headerText = 'text-white/90';
+        const headerTrack = 'text-white/50';
+        const contentBorder = 'border-brand-lightgray';
+
+        const daysHTML = data.days.map(day => renderDayCard(day)).join('');
+        const reflectionHTML = renderReflectionTable(data);
+
+        return `
+            <section class="${isWeek1 ? 'mb-12' : ''}">
+                <div class="${headerBg} text-white p-4 rounded-t-xl flex justify-between items-center border-b border-white/10">
+                    <div>
+                        <h3 class="text-2xl font-bold flex items-center gap-2">${data.title}</h3>
+                        <p class="${headerText} text-sm mt-1">${data.focus}</p>
+                    </div>
+                    <div class="hidden md:block ${headerTrack} font-bold uppercase tracking-widest opacity-50">
+                        Monday — Friday
+                    </div>
+                </div>
+                <div class="bg-white border-x border-b ${contentBorder} shadow-md p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 lg:gap-6">
+                        ${daysHTML}
+                    </div>
+                </div>
+                ${reflectionHTML}
+            </section>
+        `;
+    };
+
+    const renderChartsSection = () => `
+        <section class="mt-16 pt-12 border-t border-brand-lightgray">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                <div class="glass-card rounded-xl p-6 shadow-sm col-span-1">
+                    <h3 class="text-lg font-bold text-brand-darkest mb-2 flex items-center gap-2">
+                        📊 Training Modality Focus
+                    </h3>
+                    <p class="text-xs text-brand-dark mb-6">
+                        Visualizing the learning split. Heavy emphasis on hands-on practice directly applying the theory learned.
+                    </p>
+                    <div class="relative h-64 w-full">
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                </div>
+                <div class="glass-card rounded-xl p-6 shadow-sm md:col-span-2">
+                    <h3 class="text-lg font-bold text-brand-darkest mb-2 flex items-center gap-2">
+                        📈 Daily Topic Weighting
+                    </h3>
+                    <p class="text-xs text-brand-dark mb-6">
+                        Tracking the shift from pure CAD standards towards total Quality Assurance focus across the 10-day period.
+                    </p>
+                    <div class="relative h-[300px] w-full">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    `;
+
+    // Main App Renderer
+    const renderApp = () => {
+        // Load data from localStorage on start
+        const savedData = localStorage.getItem('trainingPlanProgress');
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                candidateName = parsed.candidateName || '';
+            } catch (e) {
+                console.error('Error parsing saved progress', e);
+            }
+        }
+
+        app.innerHTML = `
+            ${renderHeader()}
+            <main class="max-w-7xl mx-auto px-6 mt-10 space-y-12">
+                ${renderCurriculumSection()}
+
+                <div class="text-center my-12 pt-8 border-t border-brand-lightgray">
+                    <h2 class="text-3xl font-bold gradient-text">The 10-Day Execution Plan</h2>
+                    <p class="text-brand-gray mt-2 max-w-2xl mx-auto">
+                        Structured over two calendar weeks. Week 1 establishes foundations and drafting principles. Week 2 tests those skills on broken drawings and transitions to sustained live project production.
+                    </p>
+                </div>
+
+                ${renderScheduleSection(scheduleData[0])}
+
+                <div class="flex justify-center items-center gap-4 text-brand-gray my-8">
+                    <div class="h-[2px] w-16 bg-brand-lightgray"></div>
+                    <div class="text-lg font-bold tracking-widest uppercase">Weekend Break</div>
+                    <div class="h-[2px] w-16 bg-brand-lightgray"></div>
+                </div>
+
+                ${renderScheduleSection(scheduleData[1])}
+
+                ${renderChartsSection()}
+
+                <div class="mt-12 text-center pb-8" data-html2canvas-ignore="true">
+                    <button class="reset-page-btn text-brand-gray hover:text-red-600 hover:underline text-sm font-semibold py-2 px-4 transition-colors" id="reset-page-btn">
+                        Reset Page - Clear Cache
+                    </button>
+                </div>
+            </main>
+        `;
+
+        // Helper function to save progress to localStorage
+        const saveProgress = () => {
+            const progressData = {
+                candidateName: candidateName,
+                reflections: {}
+            };
+
+            scheduleData.forEach(week => {
+                week.days.forEach(day => {
+                    const select = document.getElementById(`reflection-select-w${week.weekNumber}-d${day.day}`);
+                    const notes = document.getElementById(`reflection-notes-w${week.weekNumber}-d${day.day}`);
+                    const suggestions = document.getElementById(`reflection-suggestions-w${week.weekNumber}-d${day.day}`);
+
+                    if (select || notes || suggestions) {
+                        progressData.reflections[`w${week.weekNumber}-d${day.day}`] = {
+                            select: select ? select.value : '',
+                            notes: notes ? notes.value : '',
+                            suggestions: suggestions ? suggestions.value : ''
+                        };
+                    }
+                });
+            });
+
+            localStorage.setItem('trainingPlanProgress', JSON.stringify(progressData));
+        };
+
+        // Populate saved data into fields
+        const populateSavedData = () => {
+            const savedData = localStorage.getItem('trainingPlanProgress');
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    if (parsed.reflections) {
+                        Object.keys(parsed.reflections).forEach(key => {
+                            const data = parsed.reflections[key];
+                            // Parse week and day from key (e.g., 'w1-d1')
+                            const match = key.match(/w(\d+)-d(\d+)/);
+                            if (match) {
+                                const weekNum = match[1];
+                                const dayNum = match[2];
+
+                                const select = document.getElementById(`reflection-select-w${weekNum}-d${dayNum}`);
+                                const notes = document.getElementById(`reflection-notes-w${weekNum}-d${dayNum}`);
+                                const suggestions = document.getElementById(`reflection-suggestions-w${weekNum}-d${dayNum}`);
+
+                                if (select && data.select) select.value = data.select;
+                                if (notes && data.notes) notes.value = data.notes;
+                                if (suggestions && data.suggestions) suggestions.value = data.suggestions;
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error populating saved progress', e);
+                }
+            }
+        };
+
+        populateSavedData();
+
+        // Setup Event Listeners for Candidate Name synchronization
+        const nameInputs = document.querySelectorAll('.candidate-name-input');
+        nameInputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                candidateName = e.target.value;
+                nameInputs.forEach(otherInput => {
+                    if (otherInput !== input) {
+                        otherInput.value = candidateName;
+                    }
+                });
+            });
+        });
+
+        // Setup Event Listeners for Save Progress buttons
+        document.querySelectorAll('.save-progress-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const button = e.target;
+                const originalText = button.textContent;
+
+                try {
+                    saveProgress();
+                    button.textContent = '✓ Saved!';
+                    button.classList.remove('bg-brand-darkest', 'hover:bg-brand-teal');
+                    button.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+
+                    setTimeout(() => {
+                        button.textContent = 'Save Progress';
+                        button.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+                        button.classList.add('bg-brand-darkest', 'hover:bg-brand-teal');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Save failed:', err);
+                    button.textContent = 'Error Saving';
+                    button.classList.remove('bg-brand-darkest', 'hover:bg-brand-teal');
+                    button.classList.add('bg-red-600', 'hover:bg-red-700');
+
+                    setTimeout(() => {
+                        button.textContent = 'Save Progress';
+                        button.classList.remove('bg-red-600', 'hover:bg-red-700');
+                        button.classList.add('bg-brand-darkest', 'hover:bg-brand-teal');
+                    }, 2000);
+                }
+            });
+        });
+
+        // Setup Event Listener for Reset Page button
+        const resetBtn = document.getElementById('reset-page-btn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all your saved progress? This cannot be undone.')) {
+                    localStorage.removeItem('trainingPlanProgress');
+                    window.location.reload();
+                }
+            });
+        }
+
+        const escapeHTML = (str) => {
+            if (!str) return '';
+            return str.toString().replace(/[&<>'"]/g,
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        };
+
+        // Setup Submit Buttons
+        document.querySelectorAll('.submit-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const button = e.target;
+                const dayNumber = parseInt(button.getAttribute('data-day'), 10);
+                const weekNumber = parseInt(button.getAttribute('data-week'), 10);
+                const tableContainer = document.getElementById(`reflection-table-w${weekNumber}`);
+
+                if (!tableContainer) return;
+
+                // Find the specific day's data from scheduleData
+                const weekData = scheduleData.find(w => w.weekNumber === weekNumber);
+                const dayData = weekData ? weekData.days.find(d => d.day === dayNumber) : null;
+                const objective = dayData ? dayData.goal : 'No objective found.';
+                const theory = dayData && dayData.theory ? dayData.theory : null;
+                const practice = dayData && dayData.practice ? dayData.practice : null;
+
+                // Extract reflection data from the table row
+                const tr = button.closest('tr');
+                const selectElement = tr.querySelector('select');
+                const textareas = tr.querySelectorAll('textarea');
+
+                const reflectionResponse = selectElement && selectElement.options[selectElement.selectedIndex].text !== 'Select response...' ? escapeHTML(selectElement.options[selectElement.selectedIndex].text) : 'No response selected';
+                const takeaways = textareas[0] && textareas[0].value ? escapeHTML(textareas[0].value) : 'None';
+                const suggestions = textareas[1] && textareas[1].value ? escapeHTML(textareas[1].value) : 'None';
+                const safeCandidateName = escapeHTML(candidateName || 'Not specified');
+                const safeObjective = escapeHTML(objective);
+
+                try {
+                    button.disabled = true;
+                    button.textContent = 'Wait...';
+                    button.classList.add('opacity-50', 'cursor-not-allowed');
+
+                    // Create a hidden container for the PDF layout
+                    const pdfContainer = document.createElement('div');
+                    pdfContainer.style.position = 'absolute';
+                    pdfContainer.style.left = '-9999px';
+                    pdfContainer.style.top = '0';
+                    pdfContainer.style.width = '800px';
+                    pdfContainer.style.backgroundColor = '#ffffff';
+                    pdfContainer.style.padding = '40px';
+                    pdfContainer.style.fontFamily = 'sans-serif';
+                    pdfContainer.style.color = '#0f131d'; // brand-darkest
+
+                    const today = new Date().toLocaleDateString();
+
+                    let theoryHTML = '';
+                    if (theory) {
+                        theoryHTML = `
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #b8b8b8;">
+                                <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #989fa7; margin-bottom: 5px;">${escapeHTML(theory.type)}</div>
+                                <div style="font-size: 14px; font-weight: bold; color: #0f131d; margin-bottom: 5px;">${escapeHTML(theory.title)}</div>
+                                <div style="font-size: 13px; color: #1a2e3e; line-height: 1.5;">${theory.description}</div>
+                            </div>
+                        `;
+                    }
+
+                    let practiceHTML = '';
+                    if (practice) {
+                        let practiceHighlightHTML = '';
+                        if (practice.highlightGoal) {
+                            practiceHighlightHTML = `
+                                <div style="margin-top: 10px; padding: 10px; background-color: #e6f0f3; border-left: 3px solid #025267; font-size: 12px; font-weight: bold; color: #025267;">
+                                    ${escapeHTML(practice.highlightGoal)}
+                                </div>
+                            `;
+                        }
+
+                        practiceHTML = `
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #b8b8b8;">
+                                <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #025267; margin-bottom: 5px;">${escapeHTML(practice.type)}</div>
+                                <div style="font-size: 14px; font-weight: bold; color: #0f131d; margin-bottom: 5px;">${escapeHTML(practice.title)}</div>
+                                <div style="font-size: 13px; color: #1a2e3e; line-height: 1.5;">${practice.description}</div>
+                                ${practiceHighlightHTML}
+                            </div>
+                        `;
+                    }
+
+                    pdfContainer.innerHTML = `
+                        <div style="border-bottom: 4px solid #025267; padding-bottom: 20px; margin-bottom: 30px;">
+                            <h1 style="color: #025267; margin: 0; font-size: 28px;">CAD to QA Training Plan</h1>
+                            <div style="display: flex; justify-content: space-between; margin-top: 10px; color: #1a2e3e; font-size: 14px; font-weight: bold;">
+                                <span>Day ${dayNumber} Learning Reflection</span>
+                                <span>Date: ${today}</span>
+                            </div>
+                            <div style="margin-top: 5px; color: #1a2e3e; font-size: 14px;">
+                                <strong>Candidate:</strong> ${safeCandidateName}
+                            </div>
+                        </div>
+
+                        <div style="background-color: #f2f1ef; padding: 20px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #025267;">
+                            <h2 style="margin: 0 0 10px 0; font-size: 18px; color: #0f131d;">Daily Plan Summary</h2>
+                            <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #1a2e3e;"><strong>Goal:</strong> ${safeObjective}</p>
+                            ${theoryHTML}
+                            ${practiceHTML}
+                        </div>
+
+                        <div style="margin-bottom: 30px;">
+                            <h2 style="margin: 0 0 15px 0; font-size: 18px; color: #0f131d; border-bottom: 1px solid #b8b8b8; padding-bottom: 5px;">Learning Reflection</h2>
+
+                            <div style="margin-bottom: 20px;">
+                                <strong style="display: block; margin-bottom: 5px; font-size: 14px; color: #1a2e3e;">Was material/support sufficient?</strong>
+                                <div style="background-color: #ffffff; border: 1px solid #b8b8b8; padding: 10px 15px; border-radius: 4px; font-size: 14px;">
+                                    ${reflectionResponse}
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 20px;">
+                                <strong style="display: block; margin-bottom: 5px; font-size: 14px; color: #1a2e3e;">Key Takeaways / Challenges:</strong>
+                                <div style="background-color: #ffffff; border: 1px solid #b8b8b8; padding: 15px; border-radius: 4px; font-size: 14px; min-height: 100px; white-space: pre-wrap; word-wrap: break-word; vertical-align: top;">${takeaways}</div>
+                            </div>
+
+                            <div style="margin-bottom: 20px;">
+                                <strong style="display: block; margin-bottom: 5px; font-size: 14px; color: #1a2e3e;">What additional material could be created?</strong>
+                                <div style="background-color: #ffffff; border: 1px solid #b8b8b8; padding: 15px; border-radius: 4px; font-size: 14px; min-height: 100px; white-space: pre-wrap; word-wrap: break-word; vertical-align: top;">${suggestions}</div>
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.appendChild(pdfContainer);
+
+                    // Need a slight delay for DOM to render the hidden element
+                    await new Promise(r => setTimeout(r, 100));
+
+                    const canvas = await html2canvas(pdfContainer, {
+                        scale: 2,
+                        backgroundColor: '#ffffff'
+                    });
+
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jspdf.jsPDF({
+                        orientation: 'portrait',
+                        unit: 'px',
+                        format: [canvas.width, canvas.height]
+                    });
+
+                    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+
+                    const safeName = candidateName ? candidateName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'candidate';
+                    const fileName = `${safeName}_day_${dayNumber}_reflection.pdf`;
+
+                    pdf.save(fileName);
+
+                    document.body.removeChild(pdfContainer);
+
+                    const subject = encodeURIComponent(`Day ${dayNumber} Reflection - ${candidateName || 'Candidate'}`);
+                    const body = encodeURIComponent(`Hello,\n\nPlease find attached my training reflection for Day ${dayNumber}.\n\n(Note: Please remember to manually attach the downloaded PDF: ${fileName})\n\nThank you,\n${candidateName || 'Candidate'}`);
+
+                    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                    alert('Failed to generate PDF. Please try again.');
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'Submit';
+                    button.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            });
+        });
+
+        // Setup Weekly Submit Buttons
+        document.querySelectorAll('.submit-week-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const button = e.target;
+                const weekNumber = parseInt(button.getAttribute('data-week'), 10);
+                const tableContainer = document.getElementById(`reflection-table-w${weekNumber}`);
+
+                if (!tableContainer) return;
+
+                const weekData = scheduleData.find(w => w.weekNumber === weekNumber);
+                if (!weekData) return;
+
+                const safeCandidateName = escapeHTML(candidateName || 'Not specified');
+
+                try {
+                    button.disabled = true;
+                    button.textContent = 'Wait...';
+                    button.classList.add('opacity-50', 'cursor-not-allowed');
+
+                    const pdfContainer = document.createElement('div');
+                    pdfContainer.style.position = 'absolute';
+                    pdfContainer.style.left = '-9999px';
+                    pdfContainer.style.top = '0';
+                    pdfContainer.style.width = '800px';
+                    pdfContainer.style.backgroundColor = '#ffffff';
+                    pdfContainer.style.padding = '40px';
+                    pdfContainer.style.fontFamily = 'sans-serif';
+                    pdfContainer.style.color = '#0f131d';
+
+                    const today = new Date().toLocaleDateString();
+
+                    let daysHTML = '';
+
+                    weekData.days.forEach((dayData) => {
+                        const dayNumber = dayData.day;
+                        const objective = dayData.goal || 'No objective found.';
+                        const theory = dayData.theory || null;
+                        const practice = dayData.practice || null;
+
+                        // Find corresponding row in the table
+                        const rows = tableContainer.querySelectorAll('tbody tr');
+                        let tr = null;
+                        rows.forEach(row => {
+                            if (row.querySelector('td').textContent.includes(`Day ${dayNumber}`)) {
+                                tr = row;
+                            }
+                        });
+
+                        let reflectionResponse = 'No response selected';
+                        let takeaways = 'None';
+                        let suggestions = 'None';
+
+                        if (tr) {
+                            const selectElement = tr.querySelector('select');
+                            const textareas = tr.querySelectorAll('textarea');
+                            reflectionResponse = selectElement && selectElement.options[selectElement.selectedIndex].text !== 'Select response...' ? escapeHTML(selectElement.options[selectElement.selectedIndex].text) : 'No response selected';
+                            takeaways = textareas[0] && textareas[0].value ? escapeHTML(textareas[0].value) : 'None';
+                            suggestions = textareas[1] && textareas[1].value ? escapeHTML(textareas[1].value) : 'None';
+                        }
+
+                        let theoryHTML = '';
+                        if (theory) {
+                            theoryHTML = `
+                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #b8b8b8;">
+                                    <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #989fa7; margin-bottom: 5px;">${escapeHTML(theory.type)}</div>
+                                    <div style="font-size: 14px; font-weight: bold; color: #0f131d; margin-bottom: 5px;">${escapeHTML(theory.title)}</div>
+                                    <div style="font-size: 13px; color: #1a2e3e; line-height: 1.5;">${theory.description}</div>
+                                </div>
+                            `;
+                        }
+
+                        let practiceHTML = '';
+                        if (practice) {
+                            let practiceHighlightHTML = '';
+                            if (practice.highlightGoal) {
+                                practiceHighlightHTML = `
+                                    <div style="margin-top: 10px; padding: 10px; background-color: #e6f0f3; border-left: 3px solid #025267; font-size: 12px; font-weight: bold; color: #025267;">
+                                        ${escapeHTML(practice.highlightGoal)}
+                                    </div>
+                                `;
+                            }
+
+                            practiceHTML = `
+                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #b8b8b8;">
+                                    <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #025267; margin-bottom: 5px;">${escapeHTML(practice.type)}</div>
+                                    <div style="font-size: 14px; font-weight: bold; color: #0f131d; margin-bottom: 5px;">${escapeHTML(practice.title)}</div>
+                                    <div style="font-size: 13px; color: #1a2e3e; line-height: 1.5;">${practice.description}</div>
+                                    ${practiceHighlightHTML}
+                                </div>
+                            `;
+                        }
+
+                        daysHTML += `
+                            <div style="page-break-inside: avoid; margin-bottom: 40px; border: 1px solid #b8b8b8; border-radius: 8px; overflow: hidden;">
+                                <div style="background-color: #0f131d; color: #ffffff; padding: 10px 20px; font-weight: bold; font-size: 16px;">
+                                    Day ${dayNumber} - ${escapeHTML(dayData.dayName)}
+                                </div>
+                                <div style="padding: 20px;">
+                                    <div style="background-color: #f2f1ef; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #025267;">
+                                        <h3 style="margin: 0 0 10px 0; font-size: 16px; color: #0f131d;">Plan Summary</h3>
+                                        <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #1a2e3e;"><strong>Goal:</strong> ${escapeHTML(objective)}</p>
+                                        ${theoryHTML}
+                                        ${practiceHTML}
+                                    </div>
+                                    <div>
+                                        <h3 style="margin: 0 0 10px 0; font-size: 16px; color: #0f131d; border-bottom: 1px solid #b8b8b8; padding-bottom: 5px;">Reflection</h3>
+                                        <div style="margin-bottom: 15px;">
+                                            <strong style="display: block; margin-bottom: 3px; font-size: 13px; color: #1a2e3e;">Was material/support sufficient?</strong>
+                                            <div style="font-size: 13px; padding: 8px; background-color: #f9f9f9; border: 1px solid #e5e7eb; border-radius: 4px;">${reflectionResponse}</div>
+                                        </div>
+                                        <div style="margin-bottom: 15px;">
+                                            <strong style="display: block; margin-bottom: 3px; font-size: 13px; color: #1a2e3e;">Key Takeaways / Challenges:</strong>
+                                            <div style="font-size: 13px; padding: 8px; background-color: #f9f9f9; border: 1px solid #e5e7eb; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word;">${takeaways}</div>
+                                        </div>
+                                        <div>
+                                            <strong style="display: block; margin-bottom: 3px; font-size: 13px; color: #1a2e3e;">What additional material could be created?</strong>
+                                            <div style="font-size: 13px; padding: 8px; background-color: #f9f9f9; border: 1px solid #e5e7eb; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word;">${suggestions}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    pdfContainer.innerHTML = `
+                        <div style="border-bottom: 4px solid #025267; padding-bottom: 20px; margin-bottom: 30px;">
+                            <h1 style="color: #025267; margin: 0; font-size: 28px;">CAD to QA Training Plan</h1>
+                            <div style="display: flex; justify-content: space-between; margin-top: 10px; color: #1a2e3e; font-size: 14px; font-weight: bold;">
+                                <span>Week ${weekNumber} Full Summary</span>
+                                <span>Date Exported: ${today}</span>
+                            </div>
+                            <div style="margin-top: 5px; color: #1a2e3e; font-size: 14px;">
+                                <strong>Candidate:</strong> ${safeCandidateName}
+                            </div>
+                        </div>
+
+                        ${daysHTML}
+                    `;
+
+                    document.body.appendChild(pdfContainer);
+
+                    await new Promise(r => setTimeout(r, 100));
+
+                    const canvas = await html2canvas(pdfContainer, {
+                        scale: 2,
+                        backgroundColor: '#ffffff'
+                    });
+
+                    const imgData = canvas.toDataURL('image/png');
+
+                    const pdf = new jspdf.jsPDF({
+                        orientation: 'portrait',
+                        unit: 'px',
+                        format: [canvas.width, canvas.height]
+                    });
+
+                    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+
+                    const safeName = candidateName ? candidateName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'candidate';
+                    const fileName = `${safeName}_week_${weekNumber}_summary.pdf`;
+
+                    pdf.save(fileName);
+
+                    document.body.removeChild(pdfContainer);
+
+                    const subject = encodeURIComponent(`Week ${weekNumber} Summary - ${candidateName || 'Candidate'}`);
+                    const body = encodeURIComponent(`Hello,\n\nPlease find attached my full training summary for Week ${weekNumber}.\n\n(Note: Please remember to manually attach the downloaded PDF: ${fileName})\n\nThank you,\n${candidateName || 'Candidate'}`);
+
+                    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                    alert('Failed to generate PDF summary. Please try again.');
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'Export Weekly Summary';
+                    button.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            });
+        });
+
+        // Render Charts
+        // Use brand palette for Doughnut chart, with orange for Guided Practical
+        const doughnutBrandPalette = ['#025267', '#1a2e3e', '#f35f28', '#b8b8b8'];
+        const updatedDoughnutData = {
+            ...chartData.doughnutData,
+            datasets: [{
+                ...chartData.doughnutData.datasets[0],
+                backgroundColor: doughnutBrandPalette,
+                borderWidth: 0
+            }]
+        };
+
+        // Use Primary Teal and Secondary Orange for the Bar Chart
+        const barChartColors = ['#025267', '#f35f28'];
+        const updatedBarData = {
+            ...chartData.barData,
+            datasets: chartData.barData.datasets.map((dataset, i) => ({
+                ...dataset,
+                backgroundColor: barChartColors[i % barChartColors.length]
+            }))
+        };
+
+        const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+        new Chart(doughnutCtx, {
+            type: 'doughnut',
+            data: updatedDoughnutData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { usePointStyle: true, padding: 20, font: { family: 'inherit' } } },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                const label = context[0].label;
+                                return Array.isArray(label) ? label.join(' ') : label;
+                            }
+                        }
+                    }
+                },
+                cutout: '70%',
+            }
+        });
+
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: updatedBarData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 8, font: { family: 'inherit' } } },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                const label = context[0].label;
+                                return Array.isArray(label) ? label.join(' ') : label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { stacked: true, grid: { display: false }, ticks: { font: { family: 'inherit' } } },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        max: 100,
+                        title: { display: true, text: '% Focus', font: { size: 10, family: 'inherit' } },
+                        ticks: { font: { family: 'inherit' } }
+                    }
+                }
+            }
+        });
+    };
+
+    renderApp();
+});
