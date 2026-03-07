@@ -371,6 +371,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${renderScheduleSection(scheduleData[1])}
 
                 ${renderChartsSection()}
+
+                <div class="mt-12 text-center pb-8" data-html2canvas-ignore="true">
+                    <button class="reset-page-btn text-brand-gray hover:text-red-600 hover:underline text-sm font-semibold py-2 px-4 transition-colors" id="reset-page-btn">
+                        Reset Page - Clear Cache
+                    </button>
+                </div>
             </main>
         `;
 
@@ -477,6 +483,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
+
+        // Setup Event Listener for Reset Page button
+        const resetBtn = document.getElementById('reset-page-btn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all your saved progress? This cannot be undone.')) {
+                    localStorage.removeItem('trainingPlanProgress');
+                    window.location.reload();
+                }
+            });
+        }
 
         const escapeHTML = (str) => {
             if (!str) return '';
@@ -832,23 +849,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Render Charts
-        // Map original chart colors to brand colors if needed. For now, keep as configured in data.js or override here.
-        // Let's override the background colors of the chart data to use the brand palette.
-        const brandPalette = ['#025267', '#1a2e3e', '#989fa7', '#b8b8b8'];
+        // Use brand palette for Doughnut chart
+        const doughnutBrandPalette = ['#025267', '#1a2e3e', '#989fa7', '#b8b8b8'];
         const updatedDoughnutData = {
             ...chartData.doughnutData,
             datasets: [{
                 ...chartData.doughnutData.datasets[0],
-                backgroundColor: brandPalette,
+                backgroundColor: doughnutBrandPalette,
                 borderWidth: 0
             }]
         };
 
+        // Use Primary Teal and Secondary Orange for the Bar Chart
+        const barChartColors = ['#025267', '#f35f28'];
         const updatedBarData = {
             ...chartData.barData,
             datasets: chartData.barData.datasets.map((dataset, i) => ({
                 ...dataset,
-                backgroundColor: brandPalette[i % brandPalette.length]
+                backgroundColor: barChartColors[i % barChartColors.length]
             }))
         };
 
