@@ -849,8 +849,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Render Charts
-        // Use brand palette for Doughnut chart
-        const doughnutBrandPalette = ['#025267', '#1a2e3e', '#989fa7', '#b8b8b8'];
+        // Use brand palette for Doughnut chart, with orange for Guided Practical
+        const doughnutBrandPalette = ['#025267', '#1a2e3e', '#f35f28', '#b8b8b8'];
         const updatedDoughnutData = {
             ...chartData.doughnutData,
             datasets: [{

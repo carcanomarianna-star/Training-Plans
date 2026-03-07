@@ -234,7 +234,7 @@ const chartData = {
     ],
     datasets: [
       {
-        data: [20, 30, 30, 20],
+        data: [15, 20, 35, 30],
         backgroundColor: ['#94A3B8', '#8B5CF6', '#3B82F6', '#10B981'],
         borderWidth: 2,
         borderColor: '#ffffff',
